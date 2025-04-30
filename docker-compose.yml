@@ -1,0 +1,18 @@
+services:
+  backend:
+    container_name: backend_DBB
+    stdin_open: true
+    tty: true
+    build:
+      context: ./
+      dockerfile: Dockerfile.backend
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    restart: always
+    ports:
+      - "8080:8080"
+    command: npm run start:dev
+    environment:
+      - PORT=8080
+      - NODE_ENV=development

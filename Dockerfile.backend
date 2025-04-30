@@ -1,0 +1,13 @@
+FROM node:alpine
+
+WORKDIR /app/backend
+
+COPY ./backend .
+COPY ./backend/.env ./.env
+COPY ./backend/package.json .
+
+RUN npm install
+
+EXPOSE $PORT
+
+CMD ["npm", "run", "start:dev"]

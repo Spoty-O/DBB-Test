@@ -1,0 +1,4 @@
+DB_URL=
+PORT=8080
+NODE_ENV=development
+OWN_URL=http://localhost:8080
