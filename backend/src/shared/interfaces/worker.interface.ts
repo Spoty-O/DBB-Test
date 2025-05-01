@@ -1,3 +1,5 @@
+import Decimal from "decimal.js";
+
 export enum EWorkerRole {
   EMPLOYEE = 'Employee',
   MANAGER = 'Manager',
@@ -8,8 +10,7 @@ export interface IWorker {
   id: string;
   name: string;
   date: Date;
-  base_salary: string;
+  base_salary: Decimal;
   role: EWorkerRole;
-  calculated_salary?: string;
   bossId?: string;
 }

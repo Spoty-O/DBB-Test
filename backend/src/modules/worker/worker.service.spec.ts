@@ -6,9 +6,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ErrorService } from '../error/error.service';
 import { Repository } from 'typeorm';
 import { Cache } from 'cache-manager';
-import { EWorkerRole } from '../../shared/interfaces';
 
-describe('WorkerService', () => {
+describe('WorkerServiceTests', () => {
   let service: WorkerService;
   let repo: jest.Mocked<Repository<Worker>>;
   let cache: jest.Mocked<Cache>;

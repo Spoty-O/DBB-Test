@@ -2,8 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
 import { EWorkerRole, IWorker } from 'src/shared/interfaces';
 import { WorkerDto } from '../worker.dto';
+import { WorkerResponseDto } from '../worker.response.dto';
 
-let temp: IWorker = {
+let temp: WorkerResponseDto = {
   id: randomUUID(),
   name: 'name',
   date: new Date('2023-10-01'),
@@ -14,9 +15,9 @@ let temp: IWorker = {
 
 export class GetAllReturnDto {
   @ApiProperty({
-    type: [WorkerDto],
+    type: [WorkerResponseDto],
     example: [temp, temp],
     description: 'Returns list of all workers',
   })
-  public workers!: IWorker[];
+  public workers!: WorkerResponseDto[];
 }

@@ -8,28 +8,27 @@ import {
   JoinColumn,
   BeforeUpdate,
 } from 'typeorm';
-import { calculateSalaryByYears } from '../utils';
+import { calculateSalaryByYears, DecimalTransformer } from '../utils';
+import Decimal from 'decimal.js';
 
 @Entity('workers')
 export class Worker implements IWorker {
   @PrimaryGeneratedColumn('uuid')
   public id!: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   public name!: string;
 
   @Column({ type: 'timestamp', nullable: false })
   public date!: Date;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
-  public base_salary!: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false, transformer: DecimalTransformer })
+  public base_salary!: Decimal;
 
   @Column({ type: 'enum', enum: EWorkerRole, nullable: false })
   public role!: EWorkerRole;
 
-  public calculated_salary?: string;
-
-  getCalculatedSalaryByYears(): number {
+  getCalculatedSalaryByYears(): Decimal {
     return calculateSalaryByYears(this);
   }
 

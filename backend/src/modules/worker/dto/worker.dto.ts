@@ -1,15 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsDecimal,
   IsEnum,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
   MaxLength,
 } from 'class-validator';
 import { randomUUID } from 'crypto';
+import Decimal from 'decimal.js';
 import { EWorkerRole, IWorker } from 'src/shared/interfaces';
 
 export class WorkerDto implements IWorker {
@@ -48,7 +49,8 @@ export class WorkerDto implements IWorker {
     example: 1000,
   })
   @IsDecimal()
-  base_salary!: string;
+  @Transform(({ value }) => new Decimal(value))
+  base_salary!: Decimal;
 
   @ApiProperty({
     enum: EWorkerRole,
@@ -68,16 +70,4 @@ export class WorkerDto implements IWorker {
   @IsUUID()
   @IsOptional()
   bossId?: string;
-
-  @ApiProperty({
-    type: Number,
-    name: 'calculated_salary',
-    description: 'Calculated salary of the worker',
-    example: 1200,
-    required: false,
-    nullable: true,
-  })
-  @IsDecimal()
-  @IsOptional()
-  calculated_salary?: string;
 }

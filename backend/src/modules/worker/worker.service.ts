@@ -10,6 +10,7 @@ import { WorkerCreateDto, WorkerUpdateDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EWorkerRole, IWorker } from '../../shared/interfaces';
+import Decimal from 'decimal.js';
 
 @Injectable()
 export class WorkerService {
@@ -19,36 +20,37 @@ export class WorkerService {
     @InjectRepository(Worker) private workersRepository: Repository<Worker>,
   ) {}
 
-  private async calculateSalary(worker: Worker): Promise<number> {
+  private async calculateSalary(worker: Worker): Promise<Decimal> {
     let salary = worker.getCalculatedSalaryByYears();
 
     if (worker.role === EWorkerRole.EMPLOYEE) {
       return salary;
     }
 
-    const subordinates = await this.workersRepository
-      .createQueryBuilder('worker')
-      .leftJoinAndSelect('worker.subordinates', 'worker')
-      .getMany();
+    const subordinates = await this.workersRepository.find({
+      where: { bossId: worker.id },
+    });
 
     if (worker.role === EWorkerRole.MANAGER && subordinates.length > 0) {
       for (const sub of subordinates) {
         const subSalary = sub.getCalculatedSalaryByYears();
-        salary += subSalary * 0.005;
+        salary = salary.plus(subSalary.mul(0.005));
       }
     }
 
     if (worker.role === EWorkerRole.SALES && subordinates.length > 0) {
       for (const sub of subordinates) {
         const subSalary = await this.calculateSalary(sub);
-        salary += subSalary * 0.003;
+        salary = salary.plus(subSalary.mul(0.003));
       }
     }
     return salary;
   }
 
   public async getAll(): Promise<IWorker[]> {
-    let workers = await this.cacheService.get<IWorker[]>(cacheConsts.allWorkers);
+    let workers = await this.cacheService.get<IWorker[]>(
+      cacheConsts.allWorkers,
+    );
     if (workers) {
       return workers;
     }
@@ -80,8 +82,8 @@ export class WorkerService {
     return worker;
   }
 
-  public async getSalaryByWorkerId(id: string): Promise<number> {
-    let salary = await this.cacheService.get<number>(
+  public async getSalaryByWorkerId(id: string): Promise<string> {
+    let salary = await this.cacheService.get<string>(
       cacheConsts.salaryById + id,
     );
     if (salary) {
@@ -91,30 +93,32 @@ export class WorkerService {
     if (!worker) {
       throw await this.errorService.notFound();
     }
-    salary = await this.calculateSalary(worker);
+    salary = (await this.calculateSalary(worker)).toPrecision();
     await this.cacheService.set(cacheConsts.salaryById + id, salary);
     return salary;
   }
 
-  public async getSalaryOfAllWorkers(): Promise<number> {
-    let allSalary = await this.cacheService.get<number>(cacheConsts.allSalary);
+  public async getSalaryOfAllWorkers(): Promise<string> {
+    let allSalary = await this.cacheService.get<string>(cacheConsts.allSalary);
     if (allSalary) {
       return allSalary;
     }
-    allSalary = 0;
+    let calcSalary = new Decimal(0);
     const workers = await this.workersRepository.find();
     if (!workers || workers.length === 0) {
       throw await this.errorService.notFound();
     }
     for (const worker of workers) {
-      allSalary += await this.calculateSalary(worker);
+      const subSalary = await this.calculateSalary(worker);
+      calcSalary = calcSalary.plus(subSalary);
     }
+    allSalary = calcSalary.toPrecision();
     await this.cacheService.set(cacheConsts.allSalary, allSalary);
     return allSalary;
   }
 
   public async create(body: WorkerCreateDto): Promise<IWorker> {
-    let worker = await this.workersRepository.findOneBy(body);
+    let worker = await this.workersRepository.findOneBy({ name: body.name });
     if (worker) {
       throw await this.errorService.conflict();
     }

@@ -26,6 +26,31 @@ import { WorkerCreateDto, WorkerUpdateDto } from './dto';
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
 
+  @ApiOperation({ summary: 'Get salary of all workers' })
+  @ApiResponse({
+    status: 200,
+    type: String,
+    description: 'Returns salary of all workers',
+  })
+  @Get('/salary')
+  public async getSalaryOfAllWorkers() {
+    const salary = await this.workerService.getSalaryOfAllWorkers();
+    return { salary };
+  }
+  
+  @ApiOperation({ summary: 'Get salary by worker id' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Worker ID' })
+  @ApiResponse({
+    status: 200,
+    type: String,
+    description: 'Returns salary of the worker by id',
+  })
+  @Get('/salary/:id')
+  public async getSalaryByWorkerId(@Param('id') id: string) {
+    const salary = await this.workerService.getSalaryByWorkerId(id);
+    return { salary };
+  }
+
   @ApiOperation({ summary: 'Get all workers' })
   @ApiResponse({
     status: 200,
@@ -47,29 +72,6 @@ export class WorkerController {
   public async getById(@Param('id') id: string) {
     const worker = await this.workerService.getById(id);
     return { worker };
-  }
-
-  @ApiOperation({ summary: 'Get salary by worker id' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Worker ID' })
-  @ApiResponse({
-    status: 200,
-    type: Number,
-  })
-  @Get('/salary/:id')
-  public async getSalaryByWorkerId(@Param('id') id: string) {
-    const salary = await this.workerService.getSalaryByWorkerId(id);
-    return { salary };
-  }
-
-  @ApiOperation({ summary: 'Get salary of all workers' })
-  @ApiResponse({
-    status: 200,
-    type: Number,
-  })
-  @Get('/salary')
-  public async getSalaryOfAllWorkers() {
-    const salary = await this.workerService.getSalaryOfAllWorkers();
-    return { salary };
   }
 
   @ApiOperation({ summary: 'Create a new worker' })
