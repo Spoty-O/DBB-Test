@@ -6,6 +6,9 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ErrorService } from '../error/error.service';
 import { Repository } from 'typeorm';
 import { Cache } from 'cache-manager';
+import { workerRepositoryMock } from 'src/shared/mocks/worker.repository.mock';
+import { cacheMock } from 'src/shared/mocks/cache.mock';
+import { errorServiceMock } from 'src/shared/mocks/error.mock';
 
 describe('WorkerServiceTests', () => {
   let service: WorkerService;
@@ -19,33 +22,15 @@ describe('WorkerServiceTests', () => {
         WorkerService,
         {
           provide: getRepositoryToken(Worker),
-          useValue: {
-            find: jest.fn(),
-            findOneBy: jest.fn(),
-            create: jest.fn(),
-            save: jest.fn(),
-            delete: jest.fn(),
-            update: jest.fn(),
-            createQueryBuilder: jest.fn().mockReturnValue({
-              leftJoinAndSelect: jest.fn().mockReturnThis(),
-              getMany: jest.fn(),
-            }),
-          },
+          useValue: workerRepositoryMock,
         },
         {
           provide: CACHE_MANAGER,
-          useValue: {
-            get: jest.fn(),
-            set: jest.fn(),
-            del: jest.fn(),
-          },
+          useValue: cacheMock,
         },
         {
           provide: ErrorService,
-          useValue: {
-            notFound: jest.fn().mockResolvedValue(new Error('Not Found')),
-            conflict: jest.fn().mockResolvedValue(new Error('Conflict')),
-          },
+          useValue: errorServiceMock,
         },
       ],
     }).compile();
@@ -55,6 +40,8 @@ describe('WorkerServiceTests', () => {
     cache = module.get(CACHE_MANAGER);
     errorService = module.get(ErrorService);
   });
+
+  it('should return salary by years', () => {});
 
   it('should return workers from cache', async () => {
     const workers = [{ id: '1' }] as any;

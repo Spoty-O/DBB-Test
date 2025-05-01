@@ -4,11 +4,11 @@ import { ValueTransformer } from 'typeorm';
 import Decimal from 'decimal.js';
 
 export const calculateSalaryByYears = (worker: Worker): Decimal => {
-  const now = new Date();
   const years = new Decimal(
-    Math.floor((now.getTime() - worker.date.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+    Math.floor(
+      (Date.now() - worker.date.getTime()) / (1000 * 60 * 60 * 24 * 365.25),
+    ),
   );
-  console.log('years', years);
   const base = worker.base_salary;
 
   const percent = {
@@ -16,7 +16,7 @@ export const calculateSalaryByYears = (worker: Worker): Decimal => {
     [EWorkerRole.MANAGER]: Decimal.min(years.mul(0.05), 0.4),
     [EWorkerRole.SALES]: Decimal.min(years.mul(0.01), 0.35),
   }[worker.role];
-  
+
   const calculated_salary = base.plus(base.mul(percent));
   return calculated_salary;
 };
