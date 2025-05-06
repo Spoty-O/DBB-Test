@@ -9,6 +9,7 @@ import { Cache } from 'cache-manager';
 import { workerRepositoryMock } from 'src/shared/mocks/worker.repository.mock';
 import { cacheMock } from 'src/shared/mocks/cache.mock';
 import { errorServiceMock } from 'src/shared/mocks/error.mock';
+import { generateWorkerTree, salaryFixture } from 'src/shared/fixtures';
 
 describe('WorkerServiceTests', () => {
   let service: WorkerService;
@@ -41,7 +42,10 @@ describe('WorkerServiceTests', () => {
     errorService = module.get(ErrorService);
   });
 
-  it('should return salary by years', () => {});
+  it('should return salary by years', () => {
+    const worker = salaryFixture
+    repo.find.mockResolvedValueOnce(generateWorkerTree(worker, 2));
+  });
 
   it('should return workers from cache', async () => {
     const workers = [{ id: '1' }] as any;

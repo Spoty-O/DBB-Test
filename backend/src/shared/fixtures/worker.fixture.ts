@@ -43,4 +43,19 @@ const salaryFixture: Worker = {
   subordinates: [],
 };
 
-export { employeeFixture, managerFixture, salaryFixture };
+const generateWorkerTree = (
+  worker: Worker,
+  depth: number,
+  subordinates: Worker[] = [],
+): Worker[] => {
+  if (depth <= 0) return subordinates;
+
+  const subordinate = employeeFixture;
+  subordinate.bossId = worker.id;
+  if (depth > 1) subordinate.role = EWorkerRole.SALES;
+  subordinates.push(subordinate);
+
+  return generateWorkerTree(subordinate, depth - 1, subordinates);
+};
+
+export { employeeFixture, managerFixture, salaryFixture, generateWorkerTree };
