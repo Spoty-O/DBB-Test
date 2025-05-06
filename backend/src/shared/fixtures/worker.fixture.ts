@@ -32,7 +32,7 @@ const managerFixture: Worker = {
 
 const salaryFixture: Worker = {
   id: randomUUID(),
-  name: 'John Manager',
+  name: 'John Sales',
   date: new Date('2020-01-01'),
   base_salary: new Decimal(1000),
   role: EWorkerRole.SALES,
@@ -49,13 +49,21 @@ const generateWorkerTree = (
   subordinates: Worker[] = [],
 ): Worker[] => {
   if (depth <= 0) return subordinates;
+  const newSubordinates = [
+    Object.assign(new Worker(), employeeFixture),
+    Object.assign(new Worker(), managerFixture),
+  ];
+  if (depth > 1)
+    newSubordinates.push(Object.assign(new Worker(), salaryFixture));
 
-  const subordinate = employeeFixture;
-  subordinate.bossId = worker.id;
-  if (depth > 1) subordinate.role = EWorkerRole.SALES;
-  subordinates.push(subordinate);
-
-  return generateWorkerTree(subordinate, depth - 1, subordinates);
+  for (const sub of newSubordinates) {
+    sub.id = randomUUID();
+    sub.bossId = worker.id;
+  }
+  subordinates.push(...newSubordinates);
+  const rootWorker = newSubordinates[newSubordinates.length - 1];
+  if (!rootWorker) return subordinates;
+  return generateWorkerTree(rootWorker, depth - 1, subordinates);
 };
 
 export { employeeFixture, managerFixture, salaryFixture, generateWorkerTree };

@@ -1,4 +1,4 @@
 export const errorServiceMock = {
-  notFound: jest.fn().mockResolvedValue(new Error('Not Found')),
-  conflict: jest.fn().mockResolvedValue(new Error('Conflict')),
+  notFound: jest.fn().mockRejectedValueOnce(new Error('Not Found')),
+  conflict: jest.fn().mockRejectedValueOnce(new Error('Conflict')),
 };

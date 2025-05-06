@@ -6,7 +6,6 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
-  BeforeUpdate,
 } from 'typeorm';
 import { calculateSalaryByYears, DecimalTransformer } from '../utils';
 import Decimal from 'decimal.js';

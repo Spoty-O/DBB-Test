@@ -4,6 +4,7 @@ import { Worker } from '../entities';
 
 describe('WorkerUtilTests', () => {
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 
